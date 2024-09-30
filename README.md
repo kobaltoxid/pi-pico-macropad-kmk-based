@@ -11,6 +11,7 @@ Credits to [jaysongiroux](https://github.com/jaysongiroux/pico-macro-pad) for ma
 ## Instructions
 
 1. Follow the guide over at [Citcuit Python](https://circuitpython.org/)
+1. Follow the instructions to get kmk_firmware up and running [here](https://github.com/KMKfw/kmk_firmware/blob/main/docs/en/Getting_Started.md)
 1. Copy all contents here and paste them in your board's directory.
 1. All should work.
 
@@ -29,6 +30,16 @@ keyboard.keymap = [
         KC.F22, KC.F23, KC.F24,
         KC.F19, KC.F20, KC.F21,
         KC.F16, KC.F17, KC.F18,
+    ],
+    [
+        KC.F19, KC.NO, KC.NO,
+        KC.F16, KC.F17, KC.F18,
+        KC.F13, KC.F14, KC.F15,
+    ],
+    [
+        back_nav, forward_nav, KC.LCTRL(KC.LGUI(KC.Q)),
+        KC.LGUI(KC.L), KC.LGUI(KC.F7), find_all_intellij,
+        KC.LGUI(KC.O), KC.LALT(KC.F7), KC.LGUI(KC.F12),
     ]
 ]
 
@@ -45,15 +56,7 @@ keymap_legend = [
             "1, 2, 3"
         ]
     ],
-    [def on_move_do(state):
-    if state is not None and state['direction'] == -1:
-       display.reset_wake_timer()
-       if keyboard.active_layers[0] > 0:
-           keyboard.active_layers[0] -= 1
-    elif state is not None and state['direction'] != -1:
-        display.reset_wake_timer()
-        if keyboard.active_layers[0] < 1:
-            keyboard.active_layers[0] += 1
+    [
         [
             "F22, F23, F24"
         ],
@@ -62,6 +65,28 @@ keymap_legend = [
         ],
         [
             "F16, F17, F18"
+        ]
+    ],
+    [
+        [
+            "F19, N/A, N/A"
+        ],
+        [
+            "F16, F17, F18"
+        ],
+        [
+            "F13, F14, F15"
+        ]
+    ],
+    [
+        [
+            "BCK, FWD, LCK"
+        ],
+        [
+            "LIN, FUS, FND"
+        ],
+        [
+            "CLS, USG, MTD"
         ]
     ]
 ]
@@ -83,6 +108,16 @@ display.entries = [
     TextEntry(text=str(keymap_legend[1][0]), x=64, y=24, layer=1, x_anchor="M"),
     TextEntry(text=str(keymap_legend[1][1]), x=64, y=36, layer=1, x_anchor="M"),
     TextEntry(text=str(keymap_legend[1][2]), x=64, y=48, layer=1, x_anchor="M"),
+    TextEntry(text="F_MODE_MAC", x=64, y=12, layer=2, x_anchor="M"),
+    TextEntry(text="2", x=38, y=0, layer=2),
+    TextEntry(text=str(keymap_legend[2][0]), x=64, y=24, layer=2, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[2][1]), x=64, y=36, layer=2, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[2][2]), x=64, y=48, layer=2, x_anchor="M"),
+    TextEntry(text="INTELLI_MAC", x=64, y=12, layer=3, x_anchor="M"),
+    TextEntry(text="3", x=38, y=0, layer=3),
+    TextEntry(text=str(keymap_legend[3][0]), x=64, y=24, layer=3, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[3][1]), x=64, y=36, layer=3, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[3][2]), x=64, y=48, layer=3, x_anchor="M"),
 ]
 
 # This is used to change between modes with the rotary encoder
@@ -92,8 +127,12 @@ def on_move_do(state):
        display.reset_wake_timer()
        if keyboard.active_layers[0] > 0:
            keyboard.active_layers[0] -= 1
+       else:
+           keyboard.active_layers[0] = len(keyboard.keymap) - 1
     elif state is not None and state['direction'] != -1:
         display.reset_wake_timer()
-        if keyboard.active_layers[0] < 1:
+        if keyboard.active_layers[0] < len(keyboard.keymap) - 1:
             keyboard.active_layers[0] += 1
+        else:
+            keyboard.active_layers[0] = 0
 ```
