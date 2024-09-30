@@ -36,7 +36,7 @@ back_nav = KC.MACRO(
     Delay(25),
     Tap(KC.LEFT),
     Delay(25),
-    Release(KC.LCTRL),
+    Release(KC.LGUI),
     Delay(25),
     Release(KC.LALT),
     )
@@ -48,7 +48,7 @@ forward_nav = KC.MACRO(
     Delay(25),
     Tap(KC.RIGHT),
     Delay(25),
-    Release(KC.LCTRL),
+    Release(KC.LGUI),
     Delay(25),
     Release(KC.LALT),
     )
@@ -201,8 +201,21 @@ def on_move_do(state):
 # Rotary encoder that also acts as a key
 encoder_handler = EncoderHandler()
 encoder_handler.divisor = 2
-encoder_handler.pins = ((board.GP18, board.GP19, board.GP20),)
-encoder_handler.map = (((KC.LCTRL, KC.LCTRL, KC.NLCK),),)
+encoder_handler.pins = [(board.GP18, board.GP19, board.GP20)]
+encoder_handler.map = [
+        (
+        (KC.TRNS, KC.TRNS, KC.NLCK),
+        ),
+        (
+        (KC.TRNS, KC.TRNS, KC.a),
+        ),
+        (
+        (KC.TRNS, KC.TRNS, KC.b),
+        ),
+        (
+        (KC.LCTRL, KC.LCTRL, KC.c),
+        ),
+]
 encoder_handler.on_move_do = lambda x, y, state: on_move_do(state)
 keyboard.modules.append(encoder_handler)
 
