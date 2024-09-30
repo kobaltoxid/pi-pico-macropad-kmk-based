@@ -8,6 +8,7 @@ from kmk.keys import KC
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.modules.encoder import EncoderHandler
 from kmk.scanners import DiodeOrientation
+from kmk.modules.macros import Delay, Macros, Tap, Press, Release
 
 keyboard = KMKKeyboard()
 
@@ -24,7 +25,39 @@ keyboard.row_pins = (
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
 
 media_keys = MediaKeys()
+macros = Macros()
 keyboard.extensions.append(media_keys)
+keyboard.extensions.append(macros)
+
+back_nav = KC.MACRO(
+    Press(KC.LGUI),
+    Delay(25),
+    Press(KC.LALT),
+    Delay(25),
+    Tap(KC.LEFT),
+    Delay(25),
+    Release(KC.LCTRL),
+    Delay(25),
+    Release(KC.LALT),
+    )
+
+forward_nav = KC.MACRO(
+    Press(KC.LGUI),
+    Delay(25),
+    Press(KC.LALT),
+    Delay(25),
+    Tap(KC.RIGHT),
+    Delay(25),
+    Release(KC.LCTRL),
+    Delay(25),
+    Release(KC.LALT),
+    )
+
+find_all_intellij = KC.MACRO(
+    Tap(KC.LSHIFT),
+    Delay(25),
+    Tap(KC.LSHIFT),
+)
 
 # Matrix 3x3 keymap, 9 keys in total
 keyboard.keymap = [
@@ -37,6 +70,16 @@ keyboard.keymap = [
         KC.F22, KC.F23, KC.F24,
         KC.F19, KC.F20, KC.F21,
         KC.F16, KC.F17, KC.F18,
+    ],
+    [
+        KC.F19, KC.NO, KC.NO,
+        KC.F16, KC.F17, KC.F18,
+        KC.F13, KC.F14, KC.F15,
+    ],
+    [
+        back_nav, forward_nav, KC.LCTRL(KC.LGUI(KC.Q)),
+        KC.LGUI(KC.L), KC.LGUI(KC.F7), find_all_intellij,
+        KC.LGUI(KC.O), KC.LALT(KC.F7), KC.LGUI(KC.F12),
     ]
 ]
 
@@ -61,6 +104,28 @@ keymap_legend = [
         ],
         [
             "F16, F17, F18"
+        ]
+    ],
+    [
+        [
+            "F19, N/A, N/A"
+        ],
+        [
+            "F16, F17, F18"
+        ],
+        [
+            "F13, F14, F15"
+        ]
+    ],
+    [
+        [
+            "BCK, FWD, LCK"
+        ],
+        [
+            "LIN, FUS, FND"
+        ],
+        [
+            "CLS, USG, MTD"
         ]
     ]
 ]
@@ -87,7 +152,7 @@ display = Display(
     brightness_step=0.1, # used for brightness increase/decrease keycodes
     dim_time=20, # time in seconds to reduce screen brightness
     dim_target=0.1, # set level for brightness decrease
-    off_time=10, # time in seconds to turn off screen
+    off_time=60, # time in seconds to turn off screen
     powersave_dim_time=10, # time in seconds to reduce screen brightness
     powersave_dim_target=0.1, # set level for brightness decrease
     powersave_off_time=30, # time in seconds to turn off screen
@@ -105,6 +170,16 @@ display.entries = [
     TextEntry(text=str(keymap_legend[1][0]), x=64, y=24, layer=1, x_anchor="M"),
     TextEntry(text=str(keymap_legend[1][1]), x=64, y=36, layer=1, x_anchor="M"),
     TextEntry(text=str(keymap_legend[1][2]), x=64, y=48, layer=1, x_anchor="M"),
+    TextEntry(text="F_MODE_MAC", x=64, y=12, layer=2, x_anchor="M"),
+    TextEntry(text="2", x=38, y=0, layer=2),
+    TextEntry(text=str(keymap_legend[2][0]), x=64, y=24, layer=2, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[2][1]), x=64, y=36, layer=2, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[2][2]), x=64, y=48, layer=2, x_anchor="M"),
+    TextEntry(text="INTELLI_MAC", x=64, y=12, layer=3, x_anchor="M"),
+    TextEntry(text="3", x=38, y=0, layer=3),
+    TextEntry(text=str(keymap_legend[3][0]), x=64, y=24, layer=3, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[3][1]), x=64, y=36, layer=3, x_anchor="M"),
+    TextEntry(text=str(keymap_legend[3][2]), x=64, y=48, layer=3, x_anchor="M"),
 ]
 
 keyboard.extensions.append(display)
@@ -114,10 +189,14 @@ def on_move_do(state):
        display.reset_wake_timer()
        if keyboard.active_layers[0] > 0:
            keyboard.active_layers[0] -= 1
+       else:
+           keyboard.active_layers[0] = len(keyboard.keymap) - 1
     elif state is not None and state['direction'] != -1:
         display.reset_wake_timer()
-        if keyboard.active_layers[0] < 1:
+        if keyboard.active_layers[0] < len(keyboard.keymap) - 1:
             keyboard.active_layers[0] += 1
+        else:
+            keyboard.active_layers[0] = 0
 
 # Rotary encoder that also acts as a key
 encoder_handler = EncoderHandler()
